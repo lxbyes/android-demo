@@ -1,4 +1,4 @@
-package com.leckie.servlet;
+package me.leckie.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
