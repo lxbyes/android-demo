@@ -1,6 +1,9 @@
 package me.leckie.activity;
 
 import java.lang.ref.WeakReference;
+import java.net.SocketTimeoutException;
+
+import org.apache.http.conn.ConnectTimeoutException;
 
 import me.leckie.exception.ServiceRulesException;
 import me.leckie.service.UserService;
@@ -25,9 +28,12 @@ public class LoginActivity extends Activity {
 
 	private static final String TAG = "LoginActivity";
 
-	private static final String LOGIN_SUCCESS_MSG = "登录成功";
-	public static final String LOGIN_FAILED_MSG = "用户名|密码错误";
-	private static final String LOGIN_ERROR_MSG = "登录出错";
+	private static final String MSG_LOGIN_SUCCESS = "登录成功";
+	public static final String MSG_LOGIN_FAILED = "用户名|密码错误";
+	private static final String MSG_LOGIN_ERROR = "登录出错";
+	public static final String MSG_SERVER_FAILED = "请求服务器错误";
+	public static final String MSG_REQUEST_TIMEOUT = "请求服务器超时";
+	public static final String MSG_RESPONSE_TIMEOUT = "服务器响应超时";
 
 	private static final int LOGIN_SUCESS = 1;
 
@@ -98,10 +104,22 @@ public class LoginActivity extends Activity {
 							Message msg = new Message();
 							msg.setData(data);
 							handler.sendMessage(msg);
+						} catch (ConnectTimeoutException e) {
+							Bundle data = new Bundle();
+							data.putSerializable("errorMsg", MSG_REQUEST_TIMEOUT);
+							Message msg = new Message();
+							msg.setData(data);
+							handler.sendMessage(msg);
+						} catch (SocketTimeoutException e) {
+							Bundle data = new Bundle();
+							data.putSerializable("errorMsg", MSG_RESPONSE_TIMEOUT);
+							Message msg = new Message();
+							msg.setData(data);
+							handler.sendMessage(msg);
 						} catch (Exception e) {
 							e.printStackTrace();
 							Bundle data = new Bundle();
-							data.putSerializable("errorMsg", LOGIN_ERROR_MSG);
+							data.putSerializable("errorMsg", MSG_LOGIN_ERROR);
 							Message msg = new Message();
 							msg.setData(data);
 							handler.sendMessage(msg);
@@ -152,7 +170,7 @@ public class LoginActivity extends Activity {
 						.getString("errorMsg"));
 				break;
 			case LOGIN_SUCESS:
-				((LoginActivity) mActivity.get()).showTip(LOGIN_SUCCESS_MSG);
+				((LoginActivity) mActivity.get()).showTip(MSG_LOGIN_SUCCESS);
 				break;
 			}
 		}
